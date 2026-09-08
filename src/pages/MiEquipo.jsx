@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { obtenerEquipo } from "../services/equipoApi";
+import {
+    obtenerEquipo,
+    actualizarPokemon
+} from "../services/equipoApi";
+
+
 
 function MiEquipo({ actualizarEquipo }) {
     const [equipo, setEquipo] = useState([]);
     const [error, setError] = useState("");
-
-    useEffect(() => {
-        const cargarEquipo = async () => {
+    const cargarEquipo = async () => {
             try {
                 const datos = await obtenerEquipo();
                 setEquipo(datos);
@@ -14,9 +17,28 @@ function MiEquipo({ actualizarEquipo }) {
                 setError(error.message);
             }
         };
-
+    useEffect(() => {
         cargarEquipo();
     }, [actualizarEquipo]);
+
+    const subirNivel = async (pokemon) => {
+    await actualizarPokemon(
+        pokemon.id,
+        { nivel: pokemon.nivel + 1 }
+    );
+
+    cargarEquipo();
+};
+
+    const cambiarFavorito = async (pokemon) => {
+    await actualizarPokemon(
+        pokemon.id,
+        { favorito: !pokemon.favorito }
+    );
+
+    cargarEquipo();
+};
+
 
     return (
         <section>
@@ -37,6 +59,19 @@ function MiEquipo({ actualizarEquipo }) {
                             alt={pokemon.nombre}
                         />
                         <p>Nivel: {pokemon.nivel}</p>
+                        <button
+                        onClick={() => subirNivel(pokemon)}
+                         >
+                        Subir nivel
+                        </button>
+
+                        <button
+                        onClick={() => cambiarFavorito(pokemon)}
+                        >
+                        {pokemon.favorito
+                        ? "Quitar favorito"
+                        : "Marcar favorito"}
+                        </button>
                     </article>
                 ))
             )}
