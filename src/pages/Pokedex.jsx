@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { buscarPokemon } from "../services/pokeApi";
+import { agregarAlEquipo } from "../services/equipoApi";
 
-function Pokedex() {
+function Pokedex({ onPokemonAgregado }) {
     const [busqueda, setBusqueda] = useState("");
     const [pokemon, setPokemon] = useState(null);
     const [error, setError] = useState("");
@@ -16,6 +17,31 @@ function Pokedex() {
             setError(error.message);
         }
     };
+
+    const agregarPokemon = async () => {
+    if (!pokemon) {
+        return;
+    }
+
+    const nuevoPokemon = {
+        nombre: pokemon.name,
+        imagen: pokemon.sprites.front_default,
+        nivel: 1,
+        favorito: false
+    };
+
+    try {
+        await agregarAlEquipo(nuevoPokemon);
+        onPokemonAgregado();
+        alert(
+            `${pokemon.name} fue agregado al equipo`
+        );
+    } catch (error) {
+        setError(error.message);
+    }
+};
+
+
 
     return (
         <section>
@@ -47,6 +73,10 @@ function Pokedex() {
 
                     <p>Altura: {pokemon.height}</p>
                     <p>Peso: {pokemon.weight}</p>
+
+                     <button onClick={agregarPokemon}>
+                       Agregar a mi equipo
+                     </button>
                 </article>
             )}
         </section>
